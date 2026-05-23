@@ -1,22 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { extractTextFromDocx } from "./lib/docx";
 import { tailorCv, type GeminiError } from "./lib/gemini";
 import type { Cv } from "./lib/types";
 import { CvPreview } from "./components/CvPreview";
 
-const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((m) => m.PDFDownloadLink),
-  { ssr: false, loading: () => <span className="text-zinc-500 text-sm">Loading…</span> },
-);
-
-const CvPdf = dynamic(() => import("./components/CvPdf").then((m) => m.CvPdf), {
-  ssr: false,
-});
-
 const API_KEY_STORAGE = "cv-tailor:gemini-key";
+
+async function downloadPdf(cv: Cv) {
+  const [{ pdf }, { CvPdf }] = await Promise.all([
+    import("@react-pdf/renderer"),
+    import("./components/CvPdf"),
+  ]);
+  const blob = await pdf(<CvPdf cv={cv} />).toBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${cv.name.replace(/\s+/g, "_")}_CV.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export default function Home() {
   const [apiKey, setApiKey] = useState("");
@@ -25,6 +31,7 @@ export default function Home() {
   const [originalText, setOriginalText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tailored, setTailored] = useState<Cv | null>(null);
 
@@ -183,13 +190,24 @@ export default function Home() {
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
               Tailored CV
             </h2>
-            <PDFDownloadLink
-              document={<CvPdf cv={tailored} />}
-              fileName={`${tailored.name.replace(/\s+/g, "_")}_CV.pdf`}
-              className="px-4 py-2 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700"
+            <button
+              onClick={async () => {
+                setError(null);
+                setPdfLoading(true);
+                try {
+                  await downloadPdf(tailored);
+                } catch (err) {
+                  console.error(err);
+                  setError("Could not generate the PDF. Try again.");
+                } finally {
+                  setPdfLoading(false);
+                }
+              }}
+              disabled={pdfLoading}
+              className="px-4 py-2 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-40"
             >
-              {({ loading: l }) => (l ? "Preparing PDF…" : "Download PDF")}
-            </PDFDownloadLink>
+              {pdfLoading ? "Preparing PDF…" : "Download PDF"}
+            </button>
           </div>
           <CvPreview cv={tailored} />
         </section>

@@ -7,34 +7,15 @@ import {
   View,
   StyleSheet,
   Link,
-  Font,
 } from "@react-pdf/renderer";
 import type { Cv } from "../lib/types";
-
-Font.register({
-  family: "Inter",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7SUc.ttf",
-      fontWeight: 600,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7SUc.ttf",
-      fontWeight: 700,
-    },
-  ],
-});
 
 const styles = StyleSheet.create({
   page: {
     paddingTop: 36,
     paddingBottom: 36,
     paddingHorizontal: 44,
-    fontFamily: "Inter",
+    fontFamily: "Helvetica",
     fontSize: 10.5,
     lineHeight: 1.4,
     color: "#1f2937",
@@ -43,7 +24,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: 0.2 },
   jobTitle: {
     fontSize: 12,
-    fontWeight: 600,
+    fontWeight: 700,
     color: "#374151",
     marginTop: 2,
   },
@@ -75,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   itemTitle: { fontWeight: 700, color: "#111827" },
-  itemSub: { fontWeight: 600, color: "#1f2937" },
+  itemSub: { fontWeight: 700, color: "#1f2937" },
   itemMeta: { color: "#6b7280", fontSize: 9.5 },
   itemBlock: { marginBottom: 8 },
   bulletRow: { flexDirection: "row", marginTop: 2 },
