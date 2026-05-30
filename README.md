@@ -2,7 +2,7 @@
 
 Upload your CV (Word `.docx`), paste a job description, and download a tailored PDF — all in your browser, with Gemini doing the rewriting.
 
-**Live demo:** <https://shaaa4t.github.io/custom-cv/>
+**Live demo:** <https://shaaa4t.github.io/cv-tailor/>
 
 Nothing is sent to a server you don't control: your CV and API key stay in the browser, and the Gemini call goes directly from your browser to Google.
 
