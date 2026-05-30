@@ -94,16 +94,23 @@ const SYSTEM_INSTRUCTION = `You are an expert resume writer. You will be given:
 1. The candidate's original CV (raw text extracted from a Word document).
 2. A target job description.
 
-Your task: produce a tailored CV as structured JSON that maximizes the candidate's relevance to the job, while staying TRUTHFUL to the original CV.
+Your task: AGGRESSIVELY TAILOR the candidate's CV to this specific job, producing structured JSON. The output must read like it was written FOR THIS JOB — never a generic copy of the original CV. Stay truthful to the facts in the original CV, but transform how they are presented.
 
-Rules:
-- Never invent experience, employers, dates, degrees, or skills the candidate doesn't have.
-- You MAY rephrase, reorder, and emphasize the candidate's real experience to better match the job.
-- You MAY surface skills already present in the original CV that match keywords in the job description.
-- The summary should be 2-4 sentences, sharply targeted at the role.
-- Experience bullets should start with strong action verbs and quantify impact where the original CV provides numbers. Do not fabricate metrics.
+You MUST make these visible changes (this is the whole point — do not skip them):
+- SUMMARY: Rewrite it completely from scratch as a 2-4 sentence pitch aimed directly at this role. Name the target role/field and lead with the candidate's most job-relevant strengths and the exact keywords from the job description that the candidate genuinely has. Do not reuse the original summary verbatim.
+- EXPERIENCE: Rewrite EVERY bullet to foreground the responsibilities, technologies, and outcomes that this job cares about. Reorder bullets so the most job-relevant ones come first. Mirror the job description's exact terminology (tools, methodologies, domain words) wherever the candidate's real experience supports it. Demote or compress experience that is irrelevant to this job, but do not delete real roles.
+- SKILLS: Reorder and regroup so the skills the job asks for appear first and most prominently. Use the job description's exact skill names when they match what the candidate actually knows.
+- TITLE: Set it to match or align with the target job title when the candidate's background reasonably supports it.
+
+Hard rules (truthfulness):
+- Never invent experience, employers, dates, degrees, certifications, or skills the candidate doesn't have.
+- Do not fabricate metrics. Only quantify impact when the original CV provides the number.
+- Every claim must trace back to something real in the original CV.
+
+Formatting rules:
+- Experience bullets start with strong action verbs.
 - Group skills into 2-5 logical categories (e.g., "Languages", "Frameworks", "Tools", "Soft Skills").
-- Use ATS-friendly language. Mirror exact keywords from the job description when the candidate has the underlying skill.
+- Use ATS-friendly language.
 - Keep dates in the format "MMM YYYY" (e.g., "Jan 2023" or "Present").
 - Output English only.`;
 
@@ -127,7 +134,7 @@ ${originalCvText}
 === TARGET JOB DESCRIPTION ===
 ${jobDescription}
 
-Produce the tailored CV JSON now.`;
+Now tailor this CV specifically to the job above. Rewrite the summary and experience bullets to match — do not just reformat the original. Produce the tailored CV JSON now.`;
 
   const res = await fetch(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(apiKey)}`, {
     method: "POST",
@@ -136,7 +143,7 @@ Produce the tailored CV JSON now.`;
       systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       generationConfig: {
-        temperature: 0.3,
+        temperature: 0.6,
         responseMimeType: "application/json",
         responseSchema: CV_SCHEMA,
       },
